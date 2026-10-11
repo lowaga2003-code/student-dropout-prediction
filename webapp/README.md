@@ -25,4 +25,4 @@ node test_engine.js      # optional check (needs Node.js)
 
 ## Publish with GitHub Pages
 
-Repository **Settings → Pages → Build and deployment**: Source *Deploy from a branch*, branch `main`, folder `/docs`. The demo appears at `https://YOUR-GITHUB-USERNAME.github.io/student-dropout-prediction/`.
+Repository **Settings → Pages → Build and deployment**: Source *Deploy from a branch*, branch `main`, folder `/docs`. The demo appears at `https://lowaga2003-code.github.io/student-dropout-prediction/`.
