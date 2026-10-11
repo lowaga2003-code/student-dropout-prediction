@@ -1,0 +1,199 @@
+<title>Dropout Model Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/*__BASE_CSS__*/
+.main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: center; }
+.donut { position: relative; width: 120px; height: 120px; border-radius: 50%; background: var(--panel-2); }
+.hole { position: absolute; inset: 15px; border-radius: 50%; background: var(--panel); display: grid; place-content: center; text-align: center; }
+.hole b { font-size: 27px; font-weight: 600; line-height: 1; }
+.hole span { margin-top: 3px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.risk { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+.meter { position: relative; height: 10px; border-radius: 5px; background: var(--panel-2); }
+.meter i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--c); transition: width .35s ease; }
+.meter .t { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
+.risk b { color: var(--ink); }
+.tier { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
+.vote { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 14px; font-size: 16px; color: var(--ink-2); }
+.vote .cdot { width: 14px; height: 14px; }
+.vote b { color: var(--ink); font-size: 22px; font-weight: 600; }
+.mlist { display: grid; }
+.mrow { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .8fr) minmax(0, 1.25fr) minmax(0, 1fr); gap: 6px 14px; align-items: center; padding: 11px 4px; border-top: 1px solid var(--line); }
+.mrow:first-child { border-top: 0; }
+.mrow.final { background: rgba(226, 59, 72, .07); border-radius: 10px; padding-inline: 10px; }
+.mname b { display: block; font-size: 15px; font-weight: 600; }
+.mname span { font-size: 12.5px; color: var(--muted); }
+.mpred { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; }
+.mhow { font-size: 13.5px; color: var(--ink-2); line-height: 1.35; }
+.mhow .ok, .mhow .bad { margin-left: 4px; }
+.mini { display: flex; gap: 2px; height: 10px; }
+.mini i { background: var(--c); border-radius: 2px; min-width: 2px; }
+.mini.none { height: auto; font-size: 12px; color: var(--muted); }
+.tag { margin-left: 6px; padding: 1px 6px; border-radius: 5px; border: 1px solid rgba(226, 59, 72, .6); font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--red-ink); vertical-align: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { white-space: normal; vertical-align: bottom; line-height: 1.3; }
+th { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; background: var(--panel-2); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr:last-child td { border-bottom: 0; }
+tr.final td { background: rgba(226, 59, 72, .08); }
+td small { display: block; color: var(--muted); font-size: 12px; white-space: normal; }
+@media (max-width: 700px) {
+  .mrow { grid-template-columns: minmax(0, 1fr) auto; }
+  .mhow, .mini { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) { .main { grid-template-columns: minmax(0, 1fr); justify-items: center; } .main .bars { width: 100%; } }
+@media (max-width: 560px) { .risk { grid-template-columns: minmax(0, 1fr) auto; } .risk .meter { grid-column: 1 / -1; order: 3; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="beacon" aria-hidden="true"></span>
+    <div>
+      <p class="kicker">Machine learning project &middot; R.M.L.M.K. Rajapaksha</p>
+      <h1>Six models, <em>one</em> student</h1>
+      <p class="lead">Enter a student once. My main model (Logistic Regression) and the five other model families I trained predict at the same time.</p>
+      <nav class="nav" aria-label="Pages"><a href="index.html">Risk predictor</a><a href="compare.html" aria-current="page">Compare six models</a><a id="repoLink" href="#" hidden>Code on GitHub</a></nav>
+    </div>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="form" aria-label="Student record" onsubmit="return false"><h2>Student record</h2></form>
+
+    <div class="results">
+      <section class="panel" aria-labelledby="hmain">
+        <h2 id="hmain">Main model &middot; Logistic Regression</h2>
+        <div class="main">
+          <div class="donut" id="donut" role="img" aria-label="Outcome probabilities"><div class="hole"><b id="dTop">&ndash;</b><span id="dCls"></span></div></div>
+          <div class="bars" id="bars3"></div>
+        </div>
+        <div class="risk">
+          <span>Binary dropout risk</span>
+          <div class="meter" aria-hidden="true"><i id="mFill"></i><span class="t" style="left:30%"></span><span class="t" style="left:50%"></span></div>
+          <span><b id="riskP">&ndash;</b> <span class="tier" id="tier"></span></span>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="hall">
+        <h2 id="hall">All six models</h2>
+        <p class="vote" id="vote"></p>
+        <div class="mlist" id="mlist"></div>
+        <div class="legend"><span><i class="cdot c0"></i>Dropout</span><span><i class="cdot c1"></i>Enrolled</span><span><i class="cdot c2"></i>Graduate</span><span>Bars show each model&rsquo;s probabilities (K-Means: the real outcomes inside the cluster)</span></div>
+      </section>
+
+      <section class="panel" aria-labelledby="hbest">
+        <h2 id="hbest">Optimum results</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Model</th><th class="n">CV macro F1</th><th class="n">Test accuracy</th><th class="n">Test macro F1</th><th class="n">ROC-AUC</th><th class="n">Train&ndash;test gap</th></tr></thead>
+            <tbody id="best"></tbody>
+          </table>
+        </div>
+        <p class="note">Best setting of each model family (GridSearchCV, stratified 5-fold CV), tested on the same 885 students. <span id="tableNote"></span></p>
+      </section>
+    </div>
+  </div>
+
+  <footer>The form shows 13 key inputs. The models use all 110 prepared features, so the other 23 details are filled with typical values from the training data.</footer>
+</div>
+
+<!--__DATA__-->
+<script>/*__ENGINE__*/</script>
+<script>/*__FORM__*/</script>
+<script>
+(function () {
+  function D(id) { return JSON.parse(document.getElementById(id).textContent); }
+  var pipeline = D("d-pipeline"), M = D("d-models"), schema = D("d-schema"), test = D("d-test"), KNN = D("d-knn"), TABLE = D("d-table");
+  Engine.init(pipeline, { lr3: M.lr3, lrb: M.lrb, svm: M.svm, mlp: M.mlp, kmeans: M.kmeans, forest: D("d-forest"), knn: KNN });
+  var C = Engine.CLASSES, h = SForm.h, $ = function (id) { return document.getElementById(id); };
+  function pct(p) { return p < 0.005 ? "<1%" : p > 0.995 ? ">99%" : Math.round(p * 100) + "%"; }
+
+  // rows of the live comparison list (same order as TABLE.rows)
+  var rows = TABLE.rows.map(function (md, i) {
+    var pred = h("div", { class: "mpred" }), how = h("div", { class: "mhow" }), bar = h("div", { class: "mini" });
+    $("mlist").appendChild(h("div", { class: "mrow" + (md.main ? " final" : "") },
+      h("div", { class: "mname" }, h("b", null, (i + 1) + " " + md.name, md.main ? h("span", { class: "tag", text: "Main" }) : null), h("span", { text: md.how })),
+      pred, how, bar));
+    return { pred: pred, how: how, bar: bar };
+  });
+  // results table
+  TABLE.rows.forEach(function (md, i) {
+    var cells = md.sil != null ? [h("td", { colspan: "5", text: "Unsupervised · silhouette " + md.sil.toFixed(3) })]
+      : [md.cv, md.acc, md.f1, md.auc, md.gap].map(function (v) { return h("td", { class: "n", text: v == null ? "–" : v.toFixed(3) }); });
+    $("best").appendChild(h("tr", { class: md.main ? "final" : null }, [h("td", null, (i + 1) + " " + md.name, h("small", { text: md.how }))].concat(cells)));
+  });
+  $("tableNote").textContent = TABLE.note;
+
+  function stack(el, probs) {
+    el.className = "mini"; el.textContent = "";
+    probs.forEach(function (p, k) { if (p > 0.004) el.appendChild(h("i", { class: "c" + k, style: "flex:" + p + " 1 0", title: C[k] + " " + pct(p) })); });
+  }
+  function setPred(r, cls, text, real) {
+    r.pred.textContent = ""; r.pred.appendChild(h("span", { class: "cdot c" + cls })); r.pred.appendChild(document.createTextNode(C[cls]));
+    r.how.textContent = text;
+    if (real >= 0) r.how.appendChild(h("span", { class: cls === real ? "ok" : "bad", text: cls === real ? "✓" : "✗" }));
+  }
+  function donut(p) {
+    var stops = [], at = 0, gap = 0.8, col = ["var(--dropout)", "var(--enrolled)", "var(--graduate)"];
+    p.forEach(function (v, k) {
+      var w = v * 100; if (w < 0.5) { at += w; return; }
+      var end = at + w, cut = Math.max(at, end - gap);
+      stops.push(col[k] + " " + at.toFixed(2) + "% " + cut.toFixed(2) + "%", "var(--panel) " + cut.toFixed(2) + "% " + end.toFixed(2) + "%");
+      at = end;
+    });
+    return "conic-gradient(" + stops.join(", ") + ")";
+  }
+  var bars3 = C.map(function (c, k) {
+    var fill = h("i"), val = h("span", { class: "v" }), row = h("div", { class: "bar c" + k }, h("span", { text: c }), h("span", { class: "track" }, fill), val);
+    $("bars3").appendChild(row); return { row: row, fill: fill, val: val };
+  });
+
+  function render(raw, meta) {
+    var x = Engine.features(raw), real = meta.source === "test" && !meta.edited ? C.indexOf(meta.actual) : -1;
+    var lr = Engine.lr3(x), risk = Engine.lrb(x), rf = Engine.forest(x), sv = Engine.svm(x), kn = Engine.knn(x), nn = Engine.mlp(x), km = Engine.kmeans(x);
+
+    // main model
+    $("donut").style.background = donut(lr.prob);
+    $("donut").setAttribute("aria-label", C.map(function (c, k) { return c + " " + pct(lr.prob[k]); }).join(", "));
+    $("dTop").textContent = pct(lr.prob[lr.cls]); $("dCls").textContent = C[lr.cls];
+    bars3.forEach(function (b, k) { b.fill.style.width = (lr.prob[k] * 100).toFixed(1) + "%"; b.val.textContent = pct(lr.prob[k]); b.row.classList.toggle("lead", k === lr.cls); });
+    var tier = risk >= 0.5 ? 0 : risk >= 0.3 ? 1 : 2;
+    $("mFill").className = "c" + tier; $("mFill").style.width = (risk * 100).toFixed(1) + "%";
+    $("riskP").textContent = pct(risk); $("tier").className = "tier c" + tier; $("tier").textContent = ["High risk", "Watch", "Low risk"][tier];
+
+    // all six models
+    setPred(rows[0], lr.cls, pct(lr.prob[lr.cls]) + " (softmax)", real); stack(rows[0].bar, lr.prob);
+    setPred(rows[1], rf.cls, pct(rf.prob[rf.cls]) + " (average of " + rf.trees + " trees)", real); stack(rows[1].bar, rf.prob);
+    var w = Math.max.apply(null, sv.votes);
+    setPred(rows[2], sv.cls, w === 1 ? "3-way tie in the one-vs-one duels" : "won " + w + " of 3 one-vs-one duels", real);
+    rows[2].bar.className = "mini none"; rows[2].bar.textContent = "no probabilities";
+    setPred(rows[3], kn.cls, pct(kn.prob[kn.cls]) + " of the weighted vote of the " + KNN.k + " nearest students", real); stack(rows[3].bar, kn.prob);
+    setPred(rows[4], nn.cls, pct(nn.prob[nn.cls]) + " (softmax)", real); stack(rows[4].bar, nn.prob);
+    var mix = M.kmeans.crosstab[km.cluster], size = M.kmeans.sizes[km.cluster], top = mix.indexOf(Math.max.apply(null, mix));
+    rows[5].pred.textContent = ""; rows[5].pred.appendChild(h("span", { class: "cdot", style: "background:var(--ink)" })); rows[5].pred.appendChild(document.createTextNode("Cluster K" + km.cluster));
+    rows[5].how.textContent = Math.round(mix[top] / size * 100) + "% of its " + size.toLocaleString("en") + " training students were " + C[top] + " (no labels used)";
+    stack(rows[5].bar, mix.map(function (c) { return c / size; }));
+
+    var preds = [lr.cls, rf.cls, sv.cls, kn.cls, nn.cls], n = [0, 0, 0];
+    preds.forEach(function (p) { n[p]++; });
+    var best = n.indexOf(Math.max.apply(null, n)), tie = n.filter(function (v) { return v === n[best]; }).length > 1;
+    var vote = $("vote"); vote.textContent = "";
+    if (tie) { vote.appendChild(document.createTextNode("Split vote: " + n.map(function (v, k) { return v + " " + C[k]; }).join(", ") + ". The main model says ")); vote.appendChild(h("b", { text: C[lr.cls] })); }
+    else { vote.appendChild(h("span", { class: "cdot c" + best })); vote.appendChild(h("b", { text: C[best] })); vote.appendChild(document.createTextNode(n[best] + " of 5 classifiers agree")); }
+
+    var act = SForm.actualEl(); act.textContent = "";
+    if (meta.source === "test") {
+      if (meta.edited) act.appendChild(document.createTextNode("Edited test student " + (meta.index + 1) + " (real outcome was " + meta.actual + ")"));
+      else {
+        act.appendChild(document.createTextNode("Test student " + (meta.index + 1) + " · actual outcome: ")); act.appendChild(h("b", { text: meta.actual }));
+        act.appendChild(document.createTextNode(" · " + preds.filter(function (p) { return p === real; }).length + " of 5 classifiers correct"));
+      }
+    }
+  }
+  SForm.init({ form: $("form"), schema: schema, test: test, onChange: render, start: "dropout" });
+})();
+</script>
