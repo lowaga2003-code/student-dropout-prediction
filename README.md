@@ -2,7 +2,7 @@
 
 Can we tell early which university students are likely to **drop out**, **stay enrolled** or **graduate**? In this project I prepare 4,424 real student records, train and tune six model families, and ship the final model as an interactive web demo that runs entirely in the browser.
 
-**[▶ Try the live demo](https://YOUR-GITHUB-USERNAME.github.io/student-dropout-prediction/)** · [Six models side by side](https://YOUR-GITHUB-USERNAME.github.io/student-dropout-prediction/compare.html)
+**[▶ Try the live demo](https://lowaga2003-code.github.io/student-dropout-prediction/)** · [Six models side by side](https://YOUR-GITHUB-USERNAME.github.io/student-dropout-prediction/compare.html)
 
 `Python` `pandas` `scikit-learn` `NumPy` `Matplotlib` `JavaScript` `HTML/CSS`
 
@@ -72,7 +72,7 @@ student-dropout-prediction/
 ## How to run
 
 ```bash
-git clone https://github.com/YOUR-GITHUB-USERNAME/student-dropout-prediction.git
+git clone https://github.com/lowaga2003-code/student-dropout-prediction.git
 cd student-dropout-prediction
 pip install -r requirements.txt
 jupyter notebook        # run the notebooks in order: 1 → 2 → 3
